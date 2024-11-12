@@ -3,33 +3,32 @@ from dotenv import load_dotenv
 import writer as wf
 import writer.ai
 
-# Welcome to Writer Framework! 
-# This template is a starting point for your AI apps.
-# More documentation is available at https://dev.writer.com/framework
-
 # Load environment variables from .env file
 load_dotenv()
 
 # Set the API key
 wf.api_key = os.getenv('WRITER_API_KEY')
 
-# Initialise the state
+# Initialize the state
 wf.init_state({
     "conversation": writer.ai.Conversation(),
     "my_app": {
-        "title": "Chat Assistant"
+        "title": "CHAT ASSISTANT"
     },
 })
 
-def handle_simple_message(state, payload):
-  print("Payload received:", payload)
-  state["conversation"] += payload
 
-  try: 
-    for chunk in state["conversation"].stream_complete():
-        print(chunk)
-        if not chunk.get("content"):
-           chunk["content"] = ""
-        state["conversation"] += chunk
-  except Exception as e:
-    print("Error during stream_complete:", e)
+def generate_completion(state, payload):
+    print(f"Here's what the user entered: {payload['content']}")
+    state["conversation"] += payload
+    print(f"Conversation: {state['conversation'].messages}")
+    try:
+        for index, chunk in enumerate(state["conversation"].stream_complete()):
+            print(f"Chunk {index}: {chunk}")
+            if not chunk.get("content"):
+                chunk["content"] = ""
+            state["conversation"] += chunk
+            
+        print(f"state['conversation']:\n{state['conversation'].messages}")
+    except Exception as e:
+        print(f"Error during stream_complete: {e}")

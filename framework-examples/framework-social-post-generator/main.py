@@ -1,12 +1,8 @@
 import os
+import re
 from dotenv import load_dotenv
 import writer as wf
 import writer.ai
-import re
-
-# Welcome to Writer Framework! 
-# This template is a starting point for your AI apps.
-# More documentation is available at https://dev.writer.com/framework
 
 # Load environment variables from .env file
 load_dotenv()
@@ -14,29 +10,31 @@ load_dotenv()
 # Set the API key
 wf.api_key = os.getenv('WRITER_API_KEY')
 
-# Initialise the state
+# Initialize the state
 wf.init_state({
-    "my_app": {
-        "title": "Social Posts Generator"
-    },
-    "posts": "",
     "topic": "writing",
     "message": "",
-    "tags":{} # this was missing in the tutorial
+    "tags": {},
+    "posts": "",
+    "my_app": {
+        "title": "SOCIAL POST GENERATOR"
+    }
 })
 
-def handle_button_click(state):
-    state["message"] = "% Loading up expert social media posts..."
-    
-    prompt = f"You are a social media expert. Generate 5 engaging social media posts about {state['topic']}. Include emojis."
+
+def generate_and_display_posts_and_tags(state):
+    # Display message
+    state["message"] = "% Generating social media posts and tags for you..."
+
+    # Generate and display social posts
+    prompt = f"You are a social media expert. Generate 5 engaging social media posts about {state['topic']}. Include emojis, and put a blank line between each post."
     state["posts"] = writer.ai.complete(prompt)
 
-    prompt = f"You are a social media expert. Generate 5 hashtags about {state['topic']}, delimited by spaces. For example, #dogs #cats #ducks #elephants #badgers"
-    pattern = r'#\w+'
+    # Generate and display hashtags
+    prompt = f"You are a social media expert. Generate around 5 hashtags about {state['topic']}, delimited by spaces. For example, #dogs #cats #ducks #elephants #badgers"
+    pattern = pattern = r"#\w+"
     hashtags = re.findall(pattern, writer.ai.complete(prompt))
     state["tags"] = {item: item for item in hashtags}
-    
-    state["message"] = ""
 
-def hello_world():
-    print("hello world")
+    # Hide message
+    state["message"] = ""
